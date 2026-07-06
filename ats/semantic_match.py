@@ -1,21 +1,22 @@
-from sentence_transformers import SentenceTransformer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
-import streamlit as st
-
-@st.cache_resource
-def load_model():
-    return SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def semantic_similarity(job_description, resume_text):
-    model = load_model()
+    """
+    Calculate semantic similarity using TF-IDF.
+    Returns similarity score (0–100).
+    """
 
-    jd_embedding = model.encode([job_description])
-    resume_embedding = model.encode([resume_text])
+    documents = [job_description, resume_text]
+
+    vectorizer = TfidfVectorizer(stop_words="english")
+
+    tfidf_matrix = vectorizer.fit_transform(documents)
 
     similarity = cosine_similarity(
-        jd_embedding,
-        resume_embedding
+        tfidf_matrix[0:1],
+        tfidf_matrix[1:2]
     )[0][0]
 
     return round(similarity * 100, 2)
