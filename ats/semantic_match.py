@@ -1,18 +1,16 @@
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
+import streamlit as st
 
-# Load the model only once
-model = SentenceTransformer("all-MiniLM-L6-v2")
+@st.cache_resource
+def load_model():
+    return SentenceTransformer("all-MiniLM-L6-v2")
 
 
 def semantic_similarity(job_description, resume_text):
-    """
-    Calculate semantic similarity between
-    the job description and resume.
-    """
+    model = load_model()
 
     jd_embedding = model.encode([job_description])
-
     resume_embedding = model.encode([resume_text])
 
     similarity = cosine_similarity(
