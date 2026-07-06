@@ -1,0 +1,25 @@
+# Virtual Environment
+venv/
+
+# Environment variables
+.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Uploaded resumes
+uploads/
+
+# SQLite database
+database/resumes.db
+
+# FAISS vector database
+faiss_index/
+
+# Streamlit cache
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db

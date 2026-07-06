@@ -38,7 +38,8 @@ menu = st.sidebar.radio(
     [
         "📤 Upload Resumes",
         "🎯 Screen Candidates",
-        "📂 Candidate Database"
+        "📂 Candidate Database",
+        "🤖 Resume Chat"
     ]
 )
 
@@ -63,6 +64,7 @@ if menu == "📤 Upload Resumes":
             st.stop()
 
         os.makedirs("uploads", exist_ok=True)
+        resume_texts = []
 
         for file in uploaded_files:
 
@@ -78,6 +80,7 @@ if menu == "📤 Upload Resumes":
 
             if extension == "pdf":
                 text = extract_pdf_text(file)
+                
 
             elif extension == "docx":
                 text = extract_docx_text(file)
@@ -87,7 +90,10 @@ if menu == "📤 Upload Resumes":
 
             else:
                 st.error(f"Unsupported file type: {extension}")
+                
                 continue
+            resume_texts.append(text)
+
 
             details = extract_details(text)
 
@@ -102,11 +108,19 @@ if menu == "📤 Upload Resumes":
 
             )
 
+        
+
             if saved:
                 st.success(f"✅ {file.name} saved successfully.")
 
             else:
                 st.info(f"⚠ {file.name} already exists.")
+
+        from rag.vector_store import create_vector_store
+
+        if resume_texts:
+            create_vector_store(resume_texts)
+            st.success("✅ FAISS Vector Database Updated Successfully!")
 
 # ==========================================================
 # Screen Candidates
@@ -270,3 +284,28 @@ elif menu == "📂 Candidate Database":
                     st.success("Candidate deleted successfully.")
 
                     st.rerun()
+  # ==========================================================
+# Resume Chat (RAG)
+# ==========================================================
+
+elif menu == "🤖 Resume Chat":
+
+    st.header("🤖 Chat with Uploaded Resumes")
+
+    question = st.text_input(
+        "Ask anything about your uploaded resumes"
+    )
+
+    if st.button("Ask"):
+
+        if question.strip() == "":
+            st.warning("Please enter a question.")
+            st.stop()
+
+        from rag.rag_chat import ask_resume
+
+        answer = ask_resume(question)
+
+        st.markdown("### 💬 Answer")
+
+        st.write(answer)
